@@ -24,7 +24,7 @@
                     <tr>
                         <td>{!! link_to_route('tasklists.show', $tasklist->id, ['id' => $tasklist->id]) !!}</td>
                         <td>{{ $tasklist->status }}</td>
-                        <td>{{ $tasklist->tasklist }}</td>
+                        <td>{{ $tasklist->content }}</td>
                     </tr>
                 @endforeach
             </tbody>
@@ -36,4 +36,4 @@
    </div>
   @endsection
   
-  <!--{!! link_to_route('tasklists.show', $tasklist->id, ['id' => $tasklist->id]) !!} : {{ $tasklist->content }} -->
+  {{--{!! link_to_route('tasklists.show', $tasklist->id, ['id' => $tasklist->id]) !!} : {{ $tasklist->content }} --}}
