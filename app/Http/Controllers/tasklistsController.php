@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 
-use App\tasklist;
+use App\Tasklist;
 
 class tasklistsController extends Controller
 {
@@ -17,11 +17,21 @@ class tasklistsController extends Controller
      */
     public function index()
     {
-        $tasklists = tasklist::all();
+         $data = [];
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $tasklists = $user->tasklists()->orderBy('created_at', 'desc')->paginate(10);
 
-        return view('tasklists.index', [
-            'tasklists' => $tasklists,
-        ]);
+            $data = [
+                'user' => $user,
+                'tasklists' => $tasklists,
+            ];
+           
+            return view('welcome', $data);
+        }else {
+            return view('welcome');
+        }
+    
     }
 
     /**
@@ -32,11 +42,16 @@ class tasklistsController extends Controller
     public function create()
     {
         $tasklist = new tasklist;
-
-        return view('tasklists.create', [
-            'tasklist' => $tasklist,
-        ]);
+        if(\Auth::check()){
+            return view('tasklists.create',[
+                 'tasklist'=>$tasklist,
+                ]);
+        }
+        else {
+            return redirect('/');
+        }
     }
+
 
     /**
      * Store a newly created resource in storage.
@@ -51,10 +66,10 @@ class tasklistsController extends Controller
             'content' => 'required|max:191',
         ]);
         
-         $tasklist = new tasklist;
-         $tasklist->status = $request->status;
-        $tasklist->content = $request->content;
-        $tasklist->save();
+        $request->user()->tasklists()->create([
+            'status'=>$request->status,
+            'content'=>$request->content,
+            ]);
 
         return redirect('/');
     }
@@ -67,11 +82,22 @@ class tasklistsController extends Controller
      */
     public function show($id)
     {
-        $tasklist = tasklist::find($id);
 
-        return view('tasklists.show', [
-            'tasklist' => $tasklist,
-        ]);
+        $tasklist = \App\tasklist::find($id);
+        if(\Auth::check()){
+            if(\Auth::user()->id === $tasklist->user_id){
+                return view('tasklists.show',[
+                    'tasklist'=> $tasklist
+            ]);
+        }
+            else{
+            return redirct('/');
+        }
+        }
+        else{
+            return redirect('/');
+        }
+        
     }
 
     /**
@@ -83,11 +109,21 @@ class tasklistsController extends Controller
     public function edit($id)
     {
          $tasklist = tasklist::find($id);
-
-        return view('tasklists.edit', [
-            'tasklist' => $tasklist,
-        ]);
+         if(\Auth::check()){
+             if(\Auth::user()->id === $tasklist->user_id){
+                 return view('tasklists.edit',[
+                    'tasklist'=> $tasklist
+                 ]);
+          }
+             else{
+                 return redirect('/');
+             }
+         }
+         else{
+             return redirect('/');
+         }
     }
+    
 
     /**
      * Update the specified resource in storage.
