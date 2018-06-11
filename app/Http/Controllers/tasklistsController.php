@@ -91,7 +91,7 @@ class tasklistsController extends Controller
             ]);
         }
             else{
-            return redirct('/');
+            return redirect('/');
         }
         }
         else{
